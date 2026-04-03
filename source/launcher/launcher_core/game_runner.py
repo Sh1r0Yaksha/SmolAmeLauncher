@@ -101,6 +101,9 @@ class GameRunner:
 
         print("Extracted to:", app.temp_perm_path)
 
+        # --- Write Username ---
+        self._write_username_file()
+
         # --- Optional TAS injection ---
         if app.tas_checkbox.get():
             if not self._inject_tas(zip_path):
@@ -129,6 +132,28 @@ class GameRunner:
 
         # Begin polling loop (on the main thread via after())
         app.after(1000, self._poll_game_closed)
+
+    def _write_username_file(self):
+        """
+        Creates username.txt in Smol Ame_Data/StreamingAssets (if it doesn't
+        already exist) and writes the username string into it.
+        """
+        # -----------------------------------------------------------------
+        # TODO: replace this with however you want to source the username,
+        #       e.g. self.app.user_entry.get() or a dedicated attribute.
+        # -----------------------------------------------------------------
+        USERNAME = self.app.username
+
+        import os
+        streaming_assets = os.path.join(
+            self.app.temp_perm_path, "Smol Ame_Data", "StreamingAssets"
+        )
+        username_file = os.path.join(streaming_assets, "username.txt")
+
+        os.makedirs(streaming_assets, exist_ok=True)
+        with open(username_file, "w") as f:
+            f.write(USERNAME)
+        print("Written username.txt:", username_file)
 
     def _find_version_entry(self, scf) -> tuple[str, str] | None:
         """Return (version_name, zip_path) for the currently selected version."""

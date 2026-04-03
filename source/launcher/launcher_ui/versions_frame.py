@@ -86,9 +86,10 @@ class VersionsFrame(CTkScrollableFrame):
                     btn.configure(state="disabled")
                     btn.grid_forget()
 
-        self.app.update_description(
-            self.selected_version_name, self.app.selected_folder, reset=True
-        )
+        if hasattr(self.app, "description_frame"):
+            self.app.update_description(
+                self.selected_version_name, self.app.selected_folder, reset=True
+            )
 
     def select_button(self, refer: CTkButton):
         """Handle a version button click."""

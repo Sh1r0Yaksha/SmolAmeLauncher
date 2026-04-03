@@ -77,6 +77,7 @@ class App(CTk):
         # --- Data ---
         self.sorted_folders: list[dict] = []
         self.selected_folder: str = ""
+        self.username: str = ""
         self.refresh_folders(False)
 
         # --- Build UI ---
@@ -445,7 +446,8 @@ class App(CTk):
             self.refresh_folders(True)
 
     def set_username(self):
-        print("username set")
+        username = self.user_entry.get().strip()
+        self.username = username
 
     # ==================================================================
     # Lifecycle
