@@ -183,10 +183,10 @@ class GameRunner:
         else:
             print("Could not determine architecture.")
 
-        print(f" bepinex path {app.bepinex_path}")
+        print(f" bepinex path {bepinex_path}")
 
         success_bepinex = copy_directory_contents(
-            app.bepinex_path,
+            bepinex_path,
             app.temp_perm_path,
             on_error=lambda p: mb.showerror(
                 "Error", f"ERROR: Couldn't copy BepinEx files: {zip_path}"
