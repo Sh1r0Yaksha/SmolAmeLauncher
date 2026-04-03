@@ -73,6 +73,7 @@ class App(CTk):
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=3)
+        self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=1)
 
         # --- Data ---
@@ -86,6 +87,8 @@ class App(CTk):
         self._build_username_frame()
         self._build_versions_frame()
         self._build_description_frame()
+        self._build_mods_frame()
+        self._build_play_frame()
 
         # Trigger initial folder view
         self.scrollable_button_frame.switch_folders(self.selected_folder)
@@ -108,7 +111,7 @@ class App(CTk):
             border_color=self.colors["options_frame_border"],
             corner_radius=16,
         )
-        self.options_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew", columnspan=2)
+        self.options_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew", columnspan=3)
         self.options_frame.grid_columnconfigure(0, weight=1)
         self.options_frame.grid_columnconfigure(1, weight=1)
         self.options_frame.grid_columnconfigure(2, weight=2)
@@ -158,7 +161,7 @@ class App(CTk):
             border_color=self.colors["username_frame_border"],
             corner_radius=16,
         )
-        self.username_frame.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew", columnspan=2)
+        self.username_frame.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="nsew", columnspan=3)
         self.username_frame.grid_columnconfigure(0, weight=0)
         self.username_frame.grid_columnconfigure(1, weight=1)
         self.username_frame.grid_columnconfigure(2, weight=0)
@@ -237,23 +240,6 @@ class App(CTk):
         )
         self.tas_checkbox.grid(row=0, column=0, pady=0, sticky="")
 
-        # Play / Refresh buttons
-        self.button_play = CTkButton(
-            self, text="Play",
-            command=self.start_game,
-            fg_color=self.colors["button_on"],
-            hover_color=self.colors["button_hover"],
-        )
-        self.button_play.grid(row=3, column=1, padx=(0, 10), pady=10, sticky="nsew")
-
-        self.button_refresh = CTkButton(
-            self, text="Refresh",
-            command=lambda: self.refresh_folders(True),
-            fg_color=self.colors["button_on"],
-            hover_color=self.colors["button_hover"],
-        )
-        self.button_refresh.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
-
     def _build_description_frame(self):
         self.description_frame = CTkFrame(
             self,
@@ -319,6 +305,59 @@ class App(CTk):
         )
         self.program_version_title.grid(row=5, column=0, padx=(0, 14), pady=(0, 10), sticky="se")
         self.program_version_title.configure(font=("Ariel", 24))
+
+    def _build_mods_frame(self):
+        self.mods_frame = CTkFrame(
+            self,
+            fg_color=self.colors["mods_frame"],
+            border_width=4,
+            border_color=self.colors["mods_frame_border"],
+            corner_radius=16,
+        )
+
+        self.mods_frame.grid(row=2, column=2, padx=(0, 10), pady=10, sticky="nsew")
+
+        self.mods_frame.grid_columnconfigure(0, weight=1)
+        self.mods_frame.grid_rowconfigure(1, weight=0)
+        self.mods_frame.grid_rowconfigure(2, weight=1)
+
+    def _build_play_frame(self):
+        self.play_frame = CTkFrame(
+            self,
+            fg_color=self.colors["play_frame"],
+            border_width=4,
+            border_color=self.colors["play_frame_border"],
+            corner_radius=16,
+            height=42
+        )
+        self.play_frame.grid_propagate(False)
+        self.play_frame.grid(row=3, column=0, padx=10, pady=10, sticky="nsew", columnspan=3)
+        
+        self.play_frame.grid_columnconfigure(0, weight=1)
+        self.play_frame.grid_columnconfigure(1, weight=2)
+        self.play_frame.grid_columnconfigure(2, weight=2)
+
+        self.button_refresh = CTkButton(
+            self.play_frame,
+            text="Refresh",
+            command=lambda: self.refresh_folders(True),
+            fg_color=self.colors["button_on"],
+            hover_color=self.colors["button_hover"],
+            height=24
+        )
+
+        self.button_refresh.grid(row=0, column=0, padx=10, pady=(10, 5), sticky="ew")
+
+        self.button_play = CTkButton(
+            self.play_frame,
+            text="Play",
+            command=self.start_game,
+            fg_color=self.colors["button_on"],
+            hover_color=self.colors["button_hover"],
+            height=24
+        )
+
+        self.button_play.grid(row=0, column=1, columnspan=2, padx=(0, 10), pady=(10, 5), sticky="ew")
 
     # ==================================================================
     # UI update / description callbacks
