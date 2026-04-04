@@ -14,11 +14,12 @@ from traceback import format_exception
 from tkinter import PhotoImage
 
 from customtkinter import CTk, CTkFrame, CTkLabel, CTkButton, CTkOptionMenu, CTkCheckBox, CTkEntry
+import os
 from os import getcwd
 from tkinter import font as tkfont
 
 from launcher_core import StatsManager, GameRunner
-from launcher_ui import VersionsFrame
+from launcher_ui import VersionsFrame, ModsFrame
 from launcher_ui.dialogs import RemoveSelectedFiles, DeleteSelectedFilesPopup, CreateNewCategory
 from launcher_utils.file_utils import list_subfolders, import_files_dialog
 from launcher_utils.format_utils import format_playtime, truncate_label
@@ -32,6 +33,7 @@ class App(CTk):
         self.icon_ico_path  = self.program_path + "\\system\\images\\icon_main_app.ico"
         self.icon_png       = PhotoImage(file=self.program_path + "\\system\\images\\icon_add_app.png")
         self.versions_path  = self.program_path + "\\versions\\"
+        self.mods_path      = self.program_path + "\\mods\\"
         self.setting_path   = self.program_path + "\\system\\settings.json"
         self.stats_path     = self.program_path + "\\system\\stats.json"
         self.bepinex_path   = self.program_path + "\\BepinEx"
@@ -318,8 +320,33 @@ class App(CTk):
         self.mods_frame.grid(row=2, column=2, padx=(0, 10), pady=10, sticky="nsew")
 
         self.mods_frame.grid_columnconfigure(0, weight=1)
-        self.mods_frame.grid_rowconfigure(1, weight=0)
-        self.mods_frame.grid_rowconfigure(2, weight=1)
+        self.mods_frame.grid_rowconfigure(0, weight=0)
+        self.mods_frame.grid_rowconfigure(1, weight=1)
+
+        self.mods_title = CTkLabel(
+            self.mods_frame,
+            text="Mods",
+            text_color=self.colors["folder_title_color"],
+        )
+        self.mods_title.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nsew")
+        self.mods_title.configure(font=("Ariel", 18))
+
+        # Define your mods list (or pull from self.settings)
+        initial_mods = []
+        if os.path.exists(self.mods_path):
+            initial_mods = [f for f in os.listdir(self.mods_path) if os.path.isfile(os.path.join(self.mods_path, f))]
+
+        self.scrollable_mods = ModsFrame(self.mods_frame, self, initial_mods)
+        self.scrollable_mods.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+
+        self.import_mods_button = CTkButton(
+            self.mods_frame,
+            text="Import Mods",
+            command=self.import_mods,
+            fg_color=self.colors["button_on"],
+            hover_color=self.colors["button_hover"],
+        )
+        self.import_mods_button.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
     def _build_play_frame(self):
         self.play_frame = CTkFrame(
@@ -409,7 +436,13 @@ class App(CTk):
 
     def refresh_folders(self, refresh: bool):
         self.sorted_folders = list_subfolders(self.versions_path)
+        
 
+        if os.path.exists(self.mods_path):
+            mod_files = [f for f in os.listdir(self.mods_path) if os.path.isfile(os.path.join(self.mods_path, f))]
+        else:
+            mod_files = []
+        
         if refresh:
             combo = [f["name"] for f in self.sorted_folders]
             self.selected_folder = combo[0] if combo else ""
@@ -419,7 +452,10 @@ class App(CTk):
             self.scrollable_button_frame.remove_version_buttons()
             self.scrollable_button_frame.folders = self.sorted_folders
             self.scrollable_button_frame.create_version_buttons()
-
+            
+            if hasattr(self, "scrollable_mods"):
+                self.scrollable_mods.render_mods(mod_files)
+            
             self.change_folder(self.selected_folder)
 
         print("Folders refreshed: " + str(self.sorted_folders))
@@ -481,6 +517,12 @@ class App(CTk):
 
     def import_files(self):
         path_folder = self.versions_path + self.selected_folder
+        copied = import_files_dialog(path_folder)
+        if copied:
+            self.refresh_folders(True)
+
+    def import_mods(self):
+        path_folder = self.mods_path
         copied = import_files_dialog(path_folder)
         if copied:
             self.refresh_folders(True)
