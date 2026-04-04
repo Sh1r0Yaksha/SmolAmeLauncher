@@ -350,7 +350,10 @@ class App(CTk):
         # Define your mods list (or pull from self.settings)
         initial_mods = []
         if os.path.exists(self.mods_path):
-            initial_mods = [f for f in os.listdir(self.mods_path) if os.path.isfile(os.path.join(self.mods_path, f))]
+            initial_mods = [
+                f for f in os.listdir(self.mods_path) 
+                if os.path.isfile(os.path.join(self.mods_path, f)) and f.lower().endswith(".zip")
+            ]
 
         self.scrollable_mods = ModsFrame(self.mods_frame, self, initial_mods)
         self.scrollable_mods.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
