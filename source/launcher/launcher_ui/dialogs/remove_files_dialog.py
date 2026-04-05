@@ -12,12 +12,13 @@ class RemoveSelectedFiles(BaseChecklistDialog):
     def __init__(self, parent):
         folder_path = join(parent.versions_path, parent.selected_folder)
         items = list(listdir(folder_path))
+        zips = list(i for i in items if i.lower().endswith(".zip"))
 
         super().__init__(
             parent=parent,
             title="Remove files",
             heading="Choose files to remove",
-            items=items,
+            items=zips,
             frame_color_key="remove_files",
             frame_border_color_key="remove_files_border",
             text_color_key="remove_files_text_color",
