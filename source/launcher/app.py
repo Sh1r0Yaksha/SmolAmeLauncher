@@ -25,7 +25,7 @@ from tkinter import font as tkfont
 from launcher_core import StatsManager, GameRunner, PathsManager
 from launcher_ui import VersionsFrame, ModsFrame
 from launcher_ui.dialogs import RemoveSelectedFiles, DeleteSelectedFilesPopup, DeleteSelectedModsPopup, CreateNewCategory
-from launcher_utils.file_utils import list_subfolders, import_files_dialog
+from launcher_utils.file_utils import list_subfolders, import_files_dialog, import_stats_dialog
 from launcher_utils.format_utils import format_playtime, truncate_label
 from launcher_utils.constants import APPLICATION_NAME,AUTHOR_NAME,LOCAL_PATH,BASE_PATH,BASE_APPLICATION_SIZE,MIN_APPLICATION_SIZE
 
@@ -46,7 +46,7 @@ class App(CTk):
             print("Something when wrong during validating paths. Application has been closed!")
             sys.exit()
 
-        os.startfile(self.local_path)
+        # os.startfile(self.local_path)
 
         # --- Settings ---
         with open(self.setting_path, "r") as f:
@@ -129,6 +129,7 @@ class App(CTk):
         self.options_frame.grid_columnconfigure(1, weight=1)
         self.options_frame.grid_columnconfigure(2, weight=2)
         self.options_frame.grid_columnconfigure(3, weight=2)
+        self.options_frame.grid_columnconfigure(4, weight=2)
 
         self.delete_categories_button = CTkButton(
             self.options_frame,
@@ -165,6 +166,15 @@ class App(CTk):
             hover_color=self.colors["button_hover"],
         )
         self.remove_files_button.grid(row=0, column=3, padx=10, pady=10, sticky="ew")
+
+        self.import_stats_button = CTkButton(
+            self.options_frame,
+            text="Import Stats",
+            command=self.import_stats,
+            fg_color=self.colors["button_on"],
+            hover_color=self.colors["button_hover"],
+        )
+        self.import_stats_button.grid(row=0, column=4, padx=10, pady=10, sticky="ew")
 
     def _build_username_frame(self):
         self.username_frame = CTkFrame(
@@ -561,6 +571,12 @@ class App(CTk):
         copied = import_files_dialog(path_folder)
         if copied:
             self.refresh_folders(True)
+
+    def import_stats(self):
+        path_file = self.stats_path
+        copied = import_stats_dialog(path_file)
+        if copied:
+            self.stats_mgr.validate_and_load()
 
     def set_username(self):
         username = self.user_entry.get().strip()

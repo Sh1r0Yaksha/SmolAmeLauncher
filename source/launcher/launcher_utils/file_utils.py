@@ -7,6 +7,7 @@ from os.path import isfile, isdir, join
 from shutil import copy, copytree, rmtree
 from zipfile import ZipFile
 from tkinter import filedialog, messagebox as mb
+import shutil
 
 
 def list_zip_versions(folder_path: str) -> list[str]:
@@ -124,3 +125,26 @@ def import_files_dialog(dest_folder: str) -> list[str]:
         except Exception:
             pass
     return copied
+
+def import_stats_dialog(dest_file: str) -> bool:
+        path_file = dest_file
+        # 'filetypes' restricts the user to selecting .json files
+        selected_source = filedialog.askopenfilename(
+            title="Select stats.json to import",
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+        )
+
+        # 3. If the user didn't cancel the dialog, proceed with the overwrite
+        if selected_source:
+            try:
+                # shutil.copy2 overwrites the destination by default 
+                # and preserves metadata.
+                shutil.copy2(selected_source, path_file)
+                
+                # 4. Validate and load the newly overwritten file
+                return True
+                print(f"Successfully imported and overwritten: {path_file}")
+                
+            except Exception as e:
+                print(f"Failed to import file: {e}")
+                return False
